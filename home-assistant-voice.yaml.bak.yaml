@@ -1,0 +1,18 @@
+substitutions:
+  name: home-assistant-voice-0942a9
+  friendly_name: Office Assistant
+packages:
+  Nabu Casa.Home Assistant Voice PE: github://mwmdeadpool/home-assistant-voice-pe/home-assistant-voice.yaml
+  refresh: 0d
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  friendly_name: ${friendly_name}
+api:
+  encryption:
+    key: vpd+rQIUGu5rwXYgpiJEgedcj09UgCkQqZRuk5WDHnw=
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
