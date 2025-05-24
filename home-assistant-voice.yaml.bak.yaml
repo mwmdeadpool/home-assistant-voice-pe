@@ -3,7 +3,6 @@ substitutions:
   friendly_name: Office Assistant
 packages:
   Nabu Casa.Home Assistant Voice PE: github://mwmdeadpool/home-assistant-voice-pe/home-assistant-voice.yaml
-  refresh: 0d
 esphome:
   name: ${name}
   name_add_mac_suffix: false

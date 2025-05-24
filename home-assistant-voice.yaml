@@ -16,11 +16,13 @@ substitutions:
   voice_assist_error_phase_id: '11'
   # Change this to true in case you ahve a hidden SSID at home.
   hidden_ssid: "false"
+  name: home-assistant-voice-0942a9
+  friendly_name: Office Assistant
 
 esphome:
-  name: home-assistant-voice
-  friendly_name: Home Assistant Voice
-  name_add_mac_suffix: true
+  name: $(name)
+  friendly_name: $(friendly_name)
+  name_add_mac_suffix: false
   min_version: 2025.5.0
   on_boot:
     priority: 375
@@ -71,6 +73,8 @@ wifi:
     - script.execute: control_leds
   on_disconnect:
     - script.execute: control_leds
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
 
 network:
   enable_ipv6: true
@@ -86,6 +90,8 @@ api:
     - script.execute: control_leds
   on_client_disconnected:
     - script.execute: control_leds
+  encryption:
+    key: vpd+rQIUGu5rwXYgpiJEgedcj09UgCkQqZRuk5WDHnw=
 
 ota:
   - platform: esphome
