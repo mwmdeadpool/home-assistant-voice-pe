@@ -11,6 +11,15 @@ api:
   encryption:
     key: vpd+rQIUGu5rwXYgpiJEgedcj09UgCkQqZRuk5WDHnw=
 
+micro_wake_word:
+  id: mww
+  models:
+    # CUSTOM
+    - model: https://github.com/MWMDeadpool/micro-wake-word-models/raw/main/models/v2/laszlo.json
+      id: laszlo
+      probability_cutoff: 0.98
+      sliding_window_size: 7
+
 
 wifi:
   ssid: !secret wifi_ssid
