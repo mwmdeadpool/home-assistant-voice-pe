@@ -1529,8 +1529,8 @@ voice_kit:
 external_components:
   - source:
       type: git
-      url: https://github.com/esphome/home-assistant-voice-pe
-      ref: dev
+      url: https://github.com/mwmdeadpool/home-assistant-voice-pe
+      ref: tts
     components:
       - micro_wake_word
       - microphone
