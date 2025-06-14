@@ -1551,8 +1551,10 @@ micro_wake_word:
       id: okay_nabu
     - model: hey_jarvis
       id: hey_jarvis
-    - model: hey_mycroft
-      id: hey_mycroft
+    #- model: hey_mycroft
+    #  id: hey_mycroft
+    - model: github://mwmdeadpool/microWakeWord/models/v2/lazlo.json
+      id: lazlo
     - model: https://github.com/kahrendt/microWakeWord/releases/download/stop/stop.json
       id: stop
       internal: true
