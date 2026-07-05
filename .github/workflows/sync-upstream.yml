@@ -1,0 +1,72 @@
+name: Sync upstream + reapply custom wake words
+
+# Keeps the `custom` branch = upstream esphome/home-assistant-voice-pe `dev`
+# with MWMDeadpool's microWakeWord models reapplied on top. ESPHome device
+# configs point their package at `github://MWMDeadpool/home-assistant-voice-pe/home-assistant-voice.yaml@custom`.
+
+on:
+  schedule:
+    - cron: "17 8 * * *"   # daily 08:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork (tooling lives on default branch)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install "ruamel.yaml>=0.18"
+
+      - name: Stash overlay script (survives the upstream checkout)
+        run: cp .custom/apply_custom_wakewords.py /tmp/apply_custom_wakewords.py
+
+      - name: Fetch upstream dev
+        run: |
+          git remote add upstream https://github.com/esphome/home-assistant-voice-pe.git
+          git fetch upstream dev
+
+      - name: Rebuild custom branch from upstream + overlay
+        run: |
+          git checkout -B custom upstream/dev
+          python3 /tmp/apply_custom_wakewords.py home-assistant-voice.yaml
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name  "wakeword-sync-bot"
+          git config user.email "actions@users.noreply.github.com"
+          UPSTREAM_SHA="$(git rev-parse --short upstream/dev)"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes vs current custom branch — nothing to push."
+            exit 0
+          fi
+          git commit -m "sync: upstream dev @ ${UPSTREAM_SHA} + custom wake words"
+          git push -f origin custom
+          echo "Pushed custom @ upstream ${UPSTREAM_SHA}"
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "⚠️ Wake-word sync failed ($(date -u +%Y-%m-%d))" \
+            --body "The scheduled upstream sync failed — likely the upstream \`micro_wake_word.models\` layout changed and the overlay script's anchors (okay_nabu / stop) no longer match. The \`custom\` branch was NOT updated, so devices keep the last-good config. Review the run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --label "bug" 2>&1 || echo "issue creation skipped (label/perms)"
